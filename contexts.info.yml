@@ -1,0 +1,5 @@
+name: Contexts
+type: module
+description: 'Provides contexts functionality.'
+package: Other
+core: 8.x

@@ -1,0 +1,18 @@
+{
+  "name": "drupal/contexts",
+  "description": "Contexts.",
+  "type": "drupal-module",
+  "homepage": "https://www.drupal.org/project/contexts",
+  "authors": [
+    {
+      "name": "Olexii Osadchyi",
+      "email": "olexyy.mails@gmail.com",
+      "homepage": "https://www.drupal.org/u/olexyymailsgmailcom"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/contexts"
+  },
+  "license": "GPL-2.0+",
+  "require": { }
+}
