@@ -1,0 +1,13 @@
+<?php
+
+use Drupal\contexts\Path\ContextsAliasStorage;
+
+/**
+ * Implements hook_schema().
+ */
+function contexts_schema() {
+
+  $schema[ContextsAliasStorage::TABLE_CONTEXTS] = ContextsAliasStorage::schemaDefinitionContexts();
+
+  return $schema;
+}
