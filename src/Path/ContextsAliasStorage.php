@@ -137,23 +137,24 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   public function load($conditions) {
 
     $select = $this->connection->select(static::TABLE, 'a');
-    $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
+    $select->addJoin('LEFT', static::TABLE_CONTEXTS, NULL, 'a.pid = '.static::TABLE_CONTEXTS.'.pid');
     foreach ($conditions as $field => $value) {
       if ($field == 'source' || $field == 'alias') {
         // Use LIKE for case-insensitive matching.
         $select->condition('a.' . $field, $this->connection->escapeLike($value), 'LIKE');
       }
       elseif ($field == 'contexts_path') {
-        $select->condition('c.contexts_path', $value);
+        $select->condition(static::TABLE_CONTEXTS.'.contexts_path', $value);
       }
       else {
-        $select->condition('a' . $field, $value);
+        $select->condition('a.' . $field, $value);
       }
     }
     try {
 
       return $select
-        ->fields(static::TABLE)
+        ->fields('a')
+        ->fields(static::TABLE_CONTEXTS, ['contexts_path'])
         ->orderBy('a.pid', 'DESC')
         ->range(0, 1)
         ->execute()
