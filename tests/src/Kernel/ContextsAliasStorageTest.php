@@ -25,8 +25,8 @@ class ContextsAliasStorageTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
-    parent::setUp();
 
+    parent::setUp();
     $this->installSchema('system', ['url_alias']);
     $this->installSchema('contexts', ['url_alias_contexts']);
     $this->storage = $this->container->get('path.alias_storage');
@@ -82,9 +82,17 @@ class ContextsAliasStorageTest extends KernelTestBase {
       'source' => '/test-source-case',
       'contexts_path' => 'context1/context2']
     ));
+    $this->assertEquals($expected, $this->storage->load([
+      'alias' => '/test-alias-Case',
+      'contexts_path' => 'context1/context2']
+    ));
     $this->assertFalse($this->storage->load([
-        'source' => '/test-source-case',
-        'contexts_path' => 'context_not_matches']
+      'source' => '/test-source-case',
+      'contexts_path' => 'context_not_matches']
+    ));
+    $this->assertFalse($this->storage->load([
+      'alias' => '/test-alias-case',
+      'contexts_path' => 'context_not_matches']
     ));
   }
 
