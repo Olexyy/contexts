@@ -82,6 +82,10 @@ class ContextsAliasStorageTest extends KernelTestBase {
       'source' => '/test-source-case',
       'contexts_path' => 'context1/context2']
     ));
+    $this->assertFalse($this->storage->load([
+        'source' => '/test-source-case',
+        'contexts_path' => 'context_not_matches']
+    ));
   }
 
   /**
