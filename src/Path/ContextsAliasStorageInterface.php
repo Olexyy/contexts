@@ -13,15 +13,27 @@ interface ContextsAliasStorageInterface extends AliasStorageInterface {
   public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contexts = []);
 
   /**
-   * Getter for contexts hash.
-   *
-   * @param array $contexts
-   *   Array of contexts.
-   *
-   * @return string
-   *   Hash.
+   * {@inheritdoc}
    */
-  public function getContextsHash(array $contexts);
+  public function aliasExists($alias, $langcode, $source = NULL, $contexts = []);
 
+  /**
+   * Schema definition function.
+   *
+   * @return array
+   *   Schema definition.
+   */
+  public static function schemaDefinitionContexts();
+
+  /**
+   * Loads all records by condition.
+   *
+   * @param array $conditions
+   *   Conditions array.
+   *
+   * @return array
+   *   Array of results if any.
+   */
+  public function loadAll($conditions);
 
 }
