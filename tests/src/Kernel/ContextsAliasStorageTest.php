@@ -34,6 +34,7 @@ class ContextsAliasStorageTest extends KernelTestBase {
 
   /**
    * @covers ::load
+   * @covers ::save
    */
   public function testLoad() {
     $this->storage->save('/test-source-Case', '/test-alias-Case');
@@ -50,6 +51,37 @@ class ContextsAliasStorageTest extends KernelTestBase {
     $this->assertEquals($expected, $this->storage->load(['alias' => '/test-alias-case']));
     $this->assertEquals($expected, $this->storage->load(['source' => '/test-source-Case']));
     $this->assertEquals($expected, $this->storage->load(['source' => '/test-source-case']));
+  }
+
+  /**
+   * @covers ::save
+   * @covers ::load
+   */
+  public function testLoadContexts() {
+    $this->storage->save(
+      '/test-source-Case',
+      '/test-alias-Case',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2'
+      );
+
+    $expected = [
+      'pid' => '1',
+      'alias' => '/test-alias-Case',
+      'source' => '/test-source-Case',
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'contexts_path' => 'context1/context2',
+    ];
+
+    $this->assertEquals($expected, $this->storage->load(['alias' => '/test-alias-Case']));
+    $this->assertEquals($expected, $this->storage->load(['alias' => '/test-alias-case']));
+    $this->assertEquals($expected, $this->storage->load(['source' => '/test-source-Case']));
+    $this->assertEquals($expected, $this->storage->load(['source' => '/test-source-case']));
+    $this->assertEquals($expected, $this->storage->load([
+      'source' => '/test-source-case',
+      'contexts_path' => 'context1/context2']
+    ));
   }
 
   /**
