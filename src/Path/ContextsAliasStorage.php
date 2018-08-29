@@ -32,6 +32,44 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   }
 
   /**
+   * Adds contexts path by pid.
+   *
+   * @param string|int $pid
+   *   Path id.
+   * @param string $contextsPath
+   *   Contexts path.
+   *
+   * @throws \Exception
+   */
+  public function addContextsPath($pid, $contextsPath) {
+
+    $this->connection->insert(static::TABLE_CONTEXTS)
+      ->fields([
+        'pid' => $pid,
+        'contexts_path' => $contextsPath,
+      ])->execute();
+  }
+
+  /**
+   * Adds contexts path by pid.
+   *
+   * @param string|int $pid
+   *   Path id.
+   * @param string $contextsPathNew
+   *   New contexts path.
+   * @param string $contextsPathExisting
+   *   Existing contexts path.
+   */
+  public function updateContextsPath($pid, $contextsPathNew, $contextsPathExisting) {
+
+    $this->connection->update(static::TABLE_CONTEXTS)
+      ->fields(['contexts_path' => $contextsPathNew])
+      ->condition('pid', $pid)
+      ->condition('contexts_path', $contextsPathExisting)
+      ->execute();
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contextsPathNew = NULL, $contextsPathExisting = NULL) {
@@ -77,11 +115,7 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       $operation = 'insert';
       // Insert into additional table.
       if (!empty($contextsPathNew)) {
-        $this->connection->insert(static::TABLE_CONTEXTS)
-          ->fields([
-            'pid' => $pid,
-            'contexts_path' => $contextsPathNew,
-          ])->execute();
+        $this->addContextsPath($pid, $contextsPathNew);
       }
     }
     else {
@@ -90,8 +124,10 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       try {
         if (!empty($contextsPathExisting)) {
           $original = $this->connection->query(
-            'SELECT a.source, a.alias, a.langcode, c.contexts_path FROM {url_alias} AS a LEFT JOIN
-            {url_alias_contexts} AS c ON a.pid = c.pid WHERE a.pid = :pid AND c.contexts_path = :contexts_path', [
+            'SELECT ua.source, ua.alias, ua.langcode, uac.contexts_path
+            FROM {url_alias} AS ua 
+            LEFT JOIN {url_alias_contexts} AS uac ON ua.pid = uac.pid
+            WHERE ua.pid = :pid AND uac.contexts_path = :contexts_path', [
               ':pid' => $pid,
               ':contexts_path' => $contextsPathExisting,
             ])->fetchAssoc();
@@ -111,11 +147,12 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
         ->condition('pid', $pid);
       $pid = $query->execute();
       if (!empty($contextsPathNew)) {
-        $this->connection->update(static::TABLE_CONTEXTS)
-          ->fields(['contexts_path' => $contextsPathNew])
-          ->condition('pid', $pid)
-          ->condition('contexts_path', $contextsPathNew)
-          ->execute();
+        if (!empty($contextsPathExisting)) {
+          $this->updateContextsPath($pid, $contextsPathNew, $contextsPathExisting);
+        }
+        else {
+          $this->addContextsPath($pid, $contextsPathNew);
+        }
       }
       $fields['original'] = $original;
       $operation = 'update';

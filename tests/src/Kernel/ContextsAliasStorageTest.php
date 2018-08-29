@@ -154,6 +154,54 @@ class ContextsAliasStorageTest extends KernelTestBase {
   }
 
   /**
+   * @covers ::save
+   * @covers ::load
+   */
+  public function testUpdateWithContexts() {
+
+    $this->storage->save(
+      '/test-source-Case',
+      '/test-alias-Case',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2'
+    );
+    $expected []= [
+      'pid' => '1',
+      'alias' => '/test-alias-Case',
+      'source' => '/test-source-Case',
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'contexts_path' => 'context1/context2',
+    ];
+    $expected []= [
+      'pid' => '1',
+      'alias' => '/test-alias-Case',
+      'source' => '/test-source-Case',
+      'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'contexts_path' => 'context3/context4',
+    ];
+    $this->assertEquals($expected[0], $this->storage->load(['alias'=>'/test-alias-Case']), 'Url alias created.');
+    $this->storage->save(
+      '/test-source-Case',
+      '/test-alias-Case',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      '1',
+      'context3/context4',
+      'context1/context2'
+    );
+    $this->assertEquals($expected[1], $this->storage->load(['alias'=>'/test-alias-Case']), 'Url alias updated.');
+    $this->storage->save(
+      '/test-source-Case',
+      '/test-alias-Case',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context5/context6'
+    );
+    $pathAliass = $this->storage->loadAll(['alias'=>'/test-alias-Case']);
+    $this->assertCount(2, $pathAliass, 'Added new alias instead of updating');
+  }
+
+  /**
    * @covers ::lookupPathAlias
    */
   public function testLookupPathAlias() {
