@@ -136,26 +136,26 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
    */
   public function load($conditions) {
 
-    $select = $this->connection->select(static::TABLE, 'a');
-    $select->addJoin('LEFT', static::TABLE_CONTEXTS, NULL, 'a.pid = '.static::TABLE_CONTEXTS.'.pid');
+    $select = $this->connection->select(static::TABLE, 'ua');
+    $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uac', 'ua.pid = uac.pid');
     foreach ($conditions as $field => $value) {
       if ($field == 'source' || $field == 'alias') {
         // Use LIKE for case-insensitive matching.
-        $select->condition('a.' . $field, $this->connection->escapeLike($value), 'LIKE');
+        $select->condition('ua.' . $field, $this->connection->escapeLike($value), 'LIKE');
       }
       elseif ($field == 'contexts_path') {
-        $select->condition(static::TABLE_CONTEXTS.'.contexts_path', $value);
+        $select->condition('uac.contexts_path', $value);
       }
       else {
-        $select->condition('a.' . $field, $value);
+        $select->condition('ua.' . $field, $value);
       }
     }
     try {
 
       return $select
-        ->fields('a')
-        ->fields(static::TABLE_CONTEXTS, ['contexts_path'])
-        ->orderBy('a.pid', 'DESC')
+        ->fields('ua')
+        ->fields('uac', ['contexts_path'])
+        ->orderBy('ua.pid', 'DESC')
         ->range(0, 1)
         ->execute()
         ->fetchAssoc();
@@ -172,27 +172,28 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
    */
   public function loadAll($conditions) {
 
-    $select = $this->connection->select(static::TABLE, 'a');
-    $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
+    $select = $this->connection->select(static::TABLE, 'ua');
+    $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uac', 'ua.pid = uac.pid');
     foreach ($conditions as $field => $value) {
       if ($field == 'source' || $field == 'alias') {
         // Use LIKE for case-insensitive matching.
-        $select->condition('a.' . $field, $this->connection->escapeLike($value), 'LIKE');
+        $select->condition('ua.' . $field, $this->connection->escapeLike($value), 'LIKE');
       }
       elseif ($field == 'contexts_path') {
-        $select->condition('c.contexts_path', $value);
+        $select->condition('uac.contexts_path', $value);
       }
       else {
-        $select->condition('a' . $field, $value);
+        $select->condition('ua' . $field, $value);
       }
     }
     try {
 
       return $select
-        ->fields(static::TABLE)
-        ->orderBy('a.pid', 'DESC')
+        ->fields('ua')
+        ->fields('uac', ['contexts_path'])
+        ->orderBy('ua.pid', 'ASC')
         ->execute()
-        ->fetchAllAssoc('pid');
+        ->fetchAllAssoc('pid', \PDO::FETCH_ASSOC);
     }
     catch (\Exception $e) {
       $this->catchException($e);
