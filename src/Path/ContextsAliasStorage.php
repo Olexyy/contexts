@@ -245,31 +245,25 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   public function delete($conditions) {
 
     $paths = $this->loadAll($conditions);
-    $query = $this->connection->delete(static::TABLE);
-    foreach ($conditions as $field => $value) {
-      if ($field == 'source' || $field == 'alias') {
-        // Use LIKE for case-insensitive matching.
-        $query->condition($field, $this->connection->escapeLike($value), 'LIKE');
-      }
-      else {
-        $query->condition($field, $value);
-      }
-    }
-    try {
-      $deleted = $query->execute();
-      if (!empty($paths)) {
-        $this->connection->delete(static::TABLE_CONTEXTS)
-          ->condition('pid', array_keys($paths), 'IN')
+    $pids = array_keys($paths);
+    $deleted = FALSE;
+    if (!empty($pids)) {
+      try {
+        $deleted = $this->connection
+          ->delete(static::TABLE)
+          ->condition('pid', $pids, 'IN')
           ->execute();
+        $this->connection
+          ->delete(static::TABLE_CONTEXTS)
+          ->condition('pid', $pids, 'IN')
+          ->execute();
+      } catch (\Exception $e) {
+        $this->catchException($e);
       }
+      // @todo Switch to using an event for this instead of a hook.
+      $this->moduleHandler->invokeAll('path_delete', $paths);
+      Cache::invalidateTags(['route_match']);
     }
-    catch (\Exception $e) {
-      $this->catchException($e);
-      $deleted = FALSE;
-    }
-    // @todo Switch to using an event for this instead of a hook.
-    $this->moduleHandler->invokeAll('path_delete', $paths);
-    Cache::invalidateTags(['route_match']);
 
     return $deleted;
   }

@@ -201,7 +201,40 @@ class ContextsAliasStorageTest extends KernelTestBase {
     $this->assertCount(2, $pathAliass, 'Added new alias instead of updating');
   }
 
+  /**
+   * @covers ::save
+   * @covers ::delete
+   */
+  public function testDeleteWithContexts() {
 
+    $this->storage->save(
+      '/test-source-Case1',
+      '/test-alias-Case1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2'
+    );
+    $this->storage->save(
+      '/test-source-Case1',
+      '/test-alias-Case1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      '1',
+      'context3/context4'
+    );
+    $this->storage->save(
+      '/test-source-Case2',
+      '/test-alias-Case2',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context5/context6'
+    );
+    $deleted = $this->storage->delete(['alias' => '/test-alias-Case1']);
+    $this->assertEqual($deleted, 1, 'Deleted 1 record');
+    $this->assertFalse($this->storage->load(['contexts_path' => 'context1/context2']), 'No paths found');
+    $this->assertFalse($this->storage->load(['contexts_path' => 'context3/context4']), 'No paths found');
+    $this->assertEqual($this->storage->load(['contexts_path' => 'context5/context6'])['contexts_path'],
+      'context5/context6', 'Found 1 path');
+  }
 
   /**
    * @covers ::lookupPathAlias
