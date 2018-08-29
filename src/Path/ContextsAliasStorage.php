@@ -274,13 +274,13 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   public function preloadPathAlias($preloaded, $langcode, $contextsPath = NULL) {
 
     $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
-    $select = $this->connection->select(static::TABLE, 'a')
-      ->fields('a', ['source', 'alias']);
+    $select = $this->connection->select(static::TABLE, 'ua')
+      ->fields('ua', ['source', 'alias']);
 
     if (!empty($preloaded)) {
       $conditions = new Condition('OR');
       foreach ($preloaded as $preloaded_item) {
-        $conditions->condition('a.source', $this->connection->escapeLike($preloaded_item), 'LIKE');
+        $conditions->condition('ua.source', $this->connection->escapeLike($preloaded_item), 'LIKE');
       }
       $select->condition($conditions);
     }
@@ -295,17 +295,17 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       array_pop($langcode_list);
     }
     elseif ($langcode < LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      $select->orderBy('a.langcode', 'ASC');
+      $select->orderBy('ua.langcode', 'ASC');
     }
     else {
-      $select->orderBy('a.langcode', 'DESC');
+      $select->orderBy('ua.langcode', 'DESC');
     }
 
-    $select->orderBy('a.pid', 'ASC');
-    $select->condition('a.langcode', $langcode_list, 'IN');
+    $select->orderBy('ua.pid', 'ASC');
+    $select->condition('ua.langcode', $langcode_list, 'IN');
     if (!empty($contextsPath)) {
-      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
-      $select->condition('c.contexts_path', $contextsPath);
+      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
+      $select->condition('uac.contexts_path', $contextsPath);
     }
     try {
       return $select->execute()->fetchAllKeyed();
@@ -324,23 +324,23 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
     $source = $this->connection->escapeLike($path);
     $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
     // See the queries above. Use LIKE for case-insensitive matching.
-    $select = $this->connection->select(static::TABLE, 'a');
-      $select->fields('a', ['alias'])
-      ->condition('a.source', $source, 'LIKE');
+    $select = $this->connection->select(static::TABLE, 'ua');
+      $select->fields('ua', ['alias'])
+      ->condition('ua.source', $source, 'LIKE');
     if ($langcode == LanguageInterface::LANGCODE_NOT_SPECIFIED) {
       array_pop($langcode_list);
     }
     elseif ($langcode > LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      $select->orderBy('a.langcode', 'DESC');
+      $select->orderBy('ua.langcode', 'DESC');
     }
     else {
-      $select->orderBy('a.langcode', 'ASC');
+      $select->orderBy('ua.langcode', 'ASC');
     }
-    $select->orderBy('a.pid', 'DESC');
-    $select->condition('a.langcode', $langcode_list, 'IN');
+    $select->orderBy('ua.pid', 'DESC');
+    $select->condition('ua.langcode', $langcode_list, 'IN');
     if (!empty($contextsPath)) {
-      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
-      $select->condition('c.contexts_path', $contextsPath);
+      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
+      $select->condition('uac.contexts_path', $contextsPath);
     }
     try {
       return $select->execute()->fetchField();
@@ -359,23 +359,23 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
     $alias = $this->connection->escapeLike($path);
     $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
     // See the queries above. Use LIKE for case-insensitive matching.
-    $select = $this->connection->select(static::TABLE, 'a')
-      ->fields('a', ['source'])
-      ->condition('a.alias', $alias, 'LIKE');
+    $select = $this->connection->select(static::TABLE, 'ua')
+      ->fields('ua', ['source'])
+      ->condition('ua.alias', $alias, 'LIKE');
     if ($langcode == LanguageInterface::LANGCODE_NOT_SPECIFIED) {
       array_pop($langcode_list);
     }
     elseif ($langcode > LanguageInterface::LANGCODE_NOT_SPECIFIED) {
-      $select->orderBy('a.langcode', 'DESC');
+      $select->orderBy('ua.langcode', 'DESC');
     }
     else {
-      $select->orderBy('a.langcode', 'ASC');
+      $select->orderBy('ua.langcode', 'ASC');
     }
-    $select->orderBy('a.pid', 'DESC');
-    $select->condition('a.langcode', $langcode_list, 'IN');
+    $select->orderBy('ua.pid', 'DESC');
+    $select->condition('ua.langcode', $langcode_list, 'IN');
     if (!empty($contextsPath)) {
-      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
-      $select->condition('c.contexts_path', $contextsPath);
+      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
+      $select->condition('uac.contexts_path', $contextsPath);
     }
     try {
       return $select->execute()->fetchField();
@@ -392,15 +392,15 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   public function aliasExists($alias, $langcode, $source = NULL, $contextsPath = NULL) {
 
     // Use LIKE and NOT LIKE for case-insensitive matching.
-    $query = $this->connection->select(static::TABLE, 'a')
-      ->condition('a.alias', $this->connection->escapeLike($alias), 'LIKE')
-      ->condition('a.langcode', $langcode);
+    $query = $this->connection->select(static::TABLE, 'ua')
+      ->condition('ua.alias', $this->connection->escapeLike($alias), 'LIKE')
+      ->condition('ua.langcode', $langcode);
     if (!empty($source)) {
-      $query->condition('a.source', $this->connection->escapeLike($source), 'NOT LIKE');
+      $query->condition('ua.source', $this->connection->escapeLike($source), 'NOT LIKE');
     }
     if (!empty($contextsPath)) {
-      $query->addJoin('INNER', static::TABLE_CONTEXTS, 'с', 'a.pid = с.pid');
-      $query->condition('c.context', $contextsPath, 'IN');
+      $query->addJoin('INNER', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
+      $query->condition('uac.context', $contextsPath, 'IN');
     }
     $query->addExpression('1');
     $query->range(0, 1);
@@ -451,4 +451,5 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       ],
     ];
   }
+
 }
