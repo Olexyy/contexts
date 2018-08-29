@@ -139,24 +139,18 @@ class ContextsAliasStorageTest extends KernelTestBase {
     foreach (array_values($aliases) as $index => $alias) {
       $this->assertEquals($expected[$index], $alias, 'Alias matches expected.');
     }
-    /*
-    $this->assertEquals($expected, $this->storage->load([
+    $this->assertEquals($expected[0], $this->storage->load([
         'source' => '/test-source-case',
         'contexts_path' => 'context1/context2']
     ));
-    $this->assertEquals($expected, $this->storage->load([
+    $this->assertEquals($expected[1], $this->storage->load([
         'alias' => '/test-alias-Case',
-        'contexts_path' => 'context1/context2']
+        'contexts_path' => 'context3/context4']
     ));
     $this->assertFalse($this->storage->load([
         'source' => '/test-source-case',
         'contexts_path' => 'context_not_matches']
     ));
-    $this->assertFalse($this->storage->load([
-        'alias' => '/test-alias-case',
-        'contexts_path' => 'context_not_matches']
-    ));
-    */
   }
 
   /**
