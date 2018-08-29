@@ -4,6 +4,7 @@ namespace Drupal\Tests\contexts\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Plugin\migrate\source\Language;
 
 /**
  * @coversDefaultClass \Drupal\contexts\Path\ContextsAliasStorage
@@ -240,18 +241,58 @@ class ContextsAliasStorageTest extends KernelTestBase {
    * @covers ::lookupPathAlias
    */
   public function testLookupPathAlias() {
-    $this->storage->save('/test-source-Case', '/test-alias');
 
+    $this->storage->save('/test-source-Case', '/test-alias');
     $this->assertEquals('/test-alias', $this->storage->lookupPathAlias('/test-source-Case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
     $this->assertEquals('/test-alias', $this->storage->lookupPathAlias('/test-source-case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
+  }
+
+  /**
+   * @covers ::lookupPathAlias
+   */
+  public function testLookupPathAliasContexts() {
+
+    $this->storage->save(
+      '/test-source-Case1',
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2');
+    $this->storage->save(
+      '/test-source-Case2',
+      '/test-alias2',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context3/context4');
+
+    $alias = $this->storage->lookupPathAlias(
+      '/test-source-Case1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'context1/context2');
+    $this->assertEquals('/test-alias1', $alias, 'Alias found');
+    $alias = $this->storage->lookupPathAlias(
+      '/test-source-Case1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'context3/context4');
+    $this->assertFalse($alias, 'Alias not found');
   }
 
   /**
    * @covers ::lookupPathSource
    */
   public function testLookupPathSource() {
-    $this->storage->save('/test-source', '/test-alias-Case');
 
+    $this->storage->save('/test-source', '/test-alias-Case');
+    $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-Case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
+    $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
+  }
+
+  /**
+   * @covers ::lookupPathSource
+   */
+  public function testLookupPathSourceContexts() {
+
+    $this->storage->save('/test-source', '/test-alias-Case');
     $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-Case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
     $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
   }

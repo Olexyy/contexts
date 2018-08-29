@@ -320,7 +320,7 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
     $langcode_list = [$langcode, LanguageInterface::LANGCODE_NOT_SPECIFIED];
     // See the queries above. Use LIKE for case-insensitive matching.
     $select = $this->connection->select(static::TABLE, 'ua');
-      $select->fields('ua', ['alias'])
+    $select->fields('ua', ['alias'])
       ->condition('ua.source', $source, 'LIKE');
     if ($langcode == LanguageInterface::LANGCODE_NOT_SPECIFIED) {
       array_pop($langcode_list);
@@ -334,8 +334,8 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
     $select->orderBy('ua.pid', 'DESC');
     $select->condition('ua.langcode', $langcode_list, 'IN');
     if (!empty($contextsPath)) {
-      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
-      $select->condition('uac.contexts_path', $contextsPath);
+      $joined = $select->addJoin('LEFT', static::TABLE_CONTEXTS, NULL, 'ua.pid = %alias.pid');
+      $select->condition($joined . '.contexts_path', $contextsPath);
     }
     try {
       return $select->execute()->fetchField();
@@ -369,8 +369,8 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
     $select->orderBy('ua.pid', 'DESC');
     $select->condition('ua.langcode', $langcode_list, 'IN');
     if (!empty($contextsPath)) {
-      $select->addJoin('LEFT', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
-      $select->condition('uac.contexts_path', $contextsPath);
+      $joined = $select->addJoin('LEFT', static::TABLE_CONTEXTS, NULL, 'ua.pid = %alias.pid');
+      $select->condition($joined . '.contexts_path', $contextsPath);
     }
     try {
       return $select->execute()->fetchField();
