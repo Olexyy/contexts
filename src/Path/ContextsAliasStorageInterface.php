@@ -37,16 +37,6 @@ interface ContextsAliasStorageInterface extends AliasStorageInterface {
   public function addContextsPath($pid, $contextsPath);
 
   /**
-   * {@inheritdoc}
-   */
-  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contexts = []);
-
-  /**
-   * {@inheritdoc}
-   */
-  public function aliasExists($alias, $langcode, $source = NULL, $contexts = NULL);
-
-  /**
    * Schema definition function.
    *
    * @return array
@@ -64,6 +54,16 @@ interface ContextsAliasStorageInterface extends AliasStorageInterface {
    *   Array of results if any.
    */
   public function loadAll($conditions);
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contexts = []);
+
+  /**
+   * {@inheritdoc}
+   */
+  public function aliasExists($alias, $langcode, $source = NULL, $contexts = NULL);
 
   /**
    * {@inheritdoc}
