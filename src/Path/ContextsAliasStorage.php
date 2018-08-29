@@ -17,11 +17,6 @@ use Drupal\Core\Path\AliasStorage;
 class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageInterface {
 
   /**
-   * Contexts table name definition.
-   */
-  const TABLE_CONTEXTS = 'url_alias_contexts';
-
-  /**
    * ContextsAliasStorage constructor.
    *
    * {@inheritdoc}
