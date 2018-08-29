@@ -2,6 +2,7 @@
 
 namespace Drupal\contexts;
 
+use Drupal\contexts\Path\ContextsAliasManager;
 use Drupal\contexts\Path\ContextsAliasStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
@@ -18,8 +19,11 @@ class ContextsServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
 
-    $definition = $container->getDefinition('path.alias_storage');
-    $definition->setClass(ContextsAliasStorage::class);
+    $aliasStorage = $container->getDefinition('path.alias_storage');
+    $aliasStorage->setClass(ContextsAliasStorage::class);
+
+    $aliasManager = $container->getDefinition('path.alias_manager');
+    $aliasManager->setClass(ContextsAliasManager::class);
   }
 
 }

@@ -19,7 +19,7 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
    *
    * {@inheritdoc}
    */
-  public function __construct(AliasStorageInterface $storage,
+  public function __construct(ContextsAliasStorageInterface $storage,
                               AliasWhitelistInterface $whitelist,
                               LanguageManagerInterface $language_manager,
                               CacheBackendInterface $cache) {
