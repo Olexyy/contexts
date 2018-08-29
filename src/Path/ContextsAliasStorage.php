@@ -394,8 +394,8 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       $query->condition('ua.source', $this->connection->escapeLike($source), 'NOT LIKE');
     }
     if (!empty($contextsPath)) {
-      $query->addJoin('INNER', static::TABLE_CONTEXTS, 'uaс', 'ua.pid = uaс.pid');
-      $query->condition('uac.context', $contextsPath, 'IN');
+      $joined = $query->addJoin('INNER', static::TABLE_CONTEXTS, NULL, 'ua.pid = %alias.pid');
+      $query->condition($joined . '.contexts_path', $contextsPath);
     }
     $query->addExpression('1');
     $query->range(0, 1);
@@ -414,7 +414,8 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
    */
   public function getAliasesForAdminListing($header, $keys = NULL) {
 
-    // TODO implement including information about contexts.
+    // Consider including information about contexts.
+    // For this path controller needs to be refactored as well.
     return parent::getAliasesForAdminListing($header, $keys);
   }
 

@@ -4,7 +4,6 @@ namespace Drupal\Tests\contexts\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\language\Plugin\migrate\source\Language;
 
 /**
  * @coversDefaultClass \Drupal\contexts\Path\ContextsAliasStorage
@@ -292,19 +291,69 @@ class ContextsAliasStorageTest extends KernelTestBase {
    */
   public function testLookupPathSourceContexts() {
 
-    $this->storage->save('/test-source', '/test-alias-Case');
-    $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-Case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
-    $this->assertEquals('/test-source', $this->storage->lookupPathSource('/test-alias-case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
+    $this->storage->save(
+      '/test-source-Case1',
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2');
+    $this->storage->save(
+      '/test-source-Case2',
+      '/test-alias2',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context3/context4');
+    $source = $this->storage->lookupPathSource(
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'context1/context2');
+    $this->assertEquals('/test-source-Case1', $source, 'Source found');
+    $source = $this->storage->lookupPathSource(
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      'context3/context4');
+    $this->assertFalse($source, 'Source not found');
   }
 
   /**
    * @covers ::aliasExists
    */
   public function testAliasExists() {
-    $this->storage->save('/test-source-Case', '/test-alias-Case');
 
+    $this->storage->save('/test-source-Case', '/test-alias-Case');
     $this->assertTrue($this->storage->aliasExists('/test-alias-Case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
     $this->assertTrue($this->storage->aliasExists('/test-alias-case', LanguageInterface::LANGCODE_NOT_SPECIFIED));
+  }
+
+  /**
+   * @covers ::aliasExists
+   */
+  public function testAliasExistsContexts() {
+
+    $this->storage->save(
+      '/test-source-Case1',
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2');
+    $this->storage->save(
+      '/test-source-Case2',
+      '/test-alias2',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context3/context4');
+    $exists = $this->storage->aliasExists(
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context1/context2');
+    $this->assertTrue($exists, 'Alias found');
+    $exists = $this->storage->aliasExists(
+      '/test-alias1',
+      LanguageInterface::LANGCODE_NOT_SPECIFIED,
+      NULL,
+      'context3/context4');
+    $this->assertFalse($exists, 'Alias not found');
   }
 
 }
