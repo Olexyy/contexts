@@ -14,24 +14,24 @@ interface ContextsAliasManagerInterface extends AliasManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPathByAlias($alias, $langcode = NULL, $contexts = []);
+  public function getPathByAlias($alias, $langcode = NULL, $contextsPath = NULL);
 
   /**
    * {@inheritdoc}
    */
-  public function getAliasByPath($path, $langcode = NULL, $contexts = []);
+  public function getAliasByPath($path, $langcode = NULL, $contextsPath = NULL);
 
   /**
    * Key generator for internal maps.
    *
    * @param string $langcode
    *   Language code.
-   * @param array $contexts
-   *   Array of existing contexts.
+   * @param string $contextsPath
+   *   Contexts path.
    *
    * @return string
    *   Hash of key.
    */
-  public function getMapKey($langcode, array $contexts);
+  public function getMapKey($langcode, $contextsPath);
 
 }

@@ -5,7 +5,6 @@ namespace Drupal\contexts\Path;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Path\AliasStorageInterface;
 use Drupal\Core\Path\AliasWhitelistInterface;
 use Drupal\Core\Path\AliasManager;
 
@@ -13,6 +12,13 @@ use Drupal\Core\Path\AliasManager;
  * The default alias manager implementation.
  */
 class ContextsAliasManager extends AliasManager implements ContextsAliasManagerInterface{
+
+  /**
+   * Contexts alias storage.
+   *
+   * @var ContextsAliasStorageInterface
+   */
+  protected $storage;
 
   /**
    * Constructs an ContextsAliasManager.
@@ -30,22 +36,23 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
   /**
    * {@inheritdoc}
    */
-  public function getMapKey($langcode, array $contexts) {
+  public function getMapKey($langcode, $contextsPath) {
 
-    return sha1(serialize($contexts) . $langcode);
+    return sha1($contextsPath . $langcode);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getPathByAlias($alias, $langcode = NULL, $contexts = []) {
+  public function getPathByAlias($alias, $langcode = NULL, $contextsPath = NULL) {
     // If no language is explicitly specified we default to the current URL
     // language. If we used a language different from the one conveyed by the
     // requested URL, we might end up being unable to check if there is a path
     // alias matching the URL path.
     $langcode = $langcode ?: $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
-    // TODO get default| current contexts here...
-    $mapKey = $this->getMapKey($langcode, $contexts);
+    // TODO get default | current contexts here...
+    // Contexts manager service...
+    $mapKey = $this->getMapKey($langcode, $contextsPath);
 
     // If we already know that there are no paths for this alias simply return.
     if (empty($alias) || !empty($this->noPath[$mapKey][$alias])) {
@@ -60,9 +67,9 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
     }
 
     // Look for path in storage.
-    // TODO implement.
-    if ($path = $this->storage->lookupPathSource($alias, $langcode, $contexts)) {
+    if ($path = $this->storage->lookupPathSource($alias, $langcode, $contextsPath)) {
       $this->lookupMap[$mapKey][$path] = $alias;
+
       return $path;
     }
 
@@ -76,7 +83,7 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
   /**
    * {@inheritdoc}
    */
-  public function getAliasByPath($path, $langcode = NULL, $contexts = []) {
+  public function getAliasByPath($path, $langcode = NULL, $contextsPath = NULL) {
     if ($path[0] !== '/') {
       throw new \InvalidArgumentException(sprintf('Source path %s has to start with a slash.', $path));
     }
@@ -86,7 +93,9 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
     // alias matching the URL path.
     $langcode = $langcode ?: $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
     // TODO get default| current contexts here...
-    $mapKey = $this->getMapKey($langcode, $contexts);
+    // Contexts manager service...
+    $mapKey = $this->getMapKey($langcode, $contextsPath);
+
     // Check the path whitelist, if the top-level part before the first /
     // is not in the list, then there is no need to do anything further,
     // it is not in the database.
@@ -96,8 +105,8 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
 
     // During the first call to this method per language, load the expected
     // paths for the page from cache.
-    if (empty($this->langcodePreloaded[$langcode])) {
-      $this->langcodePreloaded[$langcode] = TRUE;
+    if (empty($this->langcodePreloaded[$mapKey])) {
+      $this->langcodePreloaded[$mapKey] = TRUE;
       $this->lookupMap[$mapKey] = [];
 
       // Load the cached paths that should be used for preloading. This only
@@ -116,8 +125,7 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
 
       // Load paths from cache.
       if (!empty($this->preloadedPathLookups[$mapKey])) {
-        // TODO implement...
-        $this->lookupMap[$mapKey] = $this->storage->preloadPathAlias($this->preloadedPathLookups[$mapKey], $langcode, $contexts);
+        $this->lookupMap[$mapKey] = $this->storage->preloadPathAlias($this->preloadedPathLookups[$mapKey], $langcode, $contextsPath);
         // Keep a record of paths with no alias to avoid querying twice.
         $this->noAlias[$mapKey] = array_flip(array_diff_key($this->preloadedPathLookups[$mapKey], array_keys($this->lookupMap[$mapKey])));
       }
@@ -136,8 +144,7 @@ class ContextsAliasManager extends AliasManager implements ContextsAliasManagerI
     }
 
     // Try to load alias from storage.
-    // TODO implement...
-    if ($alias = $this->storage->lookupPathAlias($path, $langcode, $mapKey)) {
+    if ($alias = $this->storage->lookupPathAlias($path, $langcode, $contextsPath)) {
       $this->lookupMap[$mapKey][$path] = $alias;
 
       return $alias;
