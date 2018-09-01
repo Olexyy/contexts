@@ -1,0 +1,17 @@
+
+# Context menu items definition
+entity.context.collection:
+  title: 'Contexts'
+  route_name: contexts.dashboard
+  description: 'Contexts dashboard'
+  parent: system.admin_structure
+
+
+# Context menu items definition
+#entity.context.collection:
+#  title: 'Contexts'
+#  route_name: entity.context.collection
+#  description: 'List Context (bundles)'
+#  parent: system.admin_structure
+#  weight: 99
+

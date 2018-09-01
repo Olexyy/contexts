@@ -1,0 +1,7 @@
+services:
+  contexts.service:
+    class: Drupal\contexts\Service\ContextsService
+    arguments:
+      -  '@entity_type.manager'
+      -  '@module_handler'
+      -  '@entity_type.bundle.info'
