@@ -27,38 +27,28 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   }
 
   /**
-   * Adds contexts path by pid.
-   *
-   * @param string|int $pid
-   *   Path id.
-   * @param string $contextsPath
-   *   Contexts path.
-   *
-   * @throws \Exception
+   * {@inheritdoc}
    */
-  public function addContextsPath($pid, $contextsPath) {
+  public function addContextsPath($pid, $contextsPath, $weight = 0) {
 
     $this->connection->insert(static::TABLE_CONTEXTS)
       ->fields([
         'pid' => $pid,
         'contexts_path' => $contextsPath,
+        'weight' => $weight,
       ])->execute();
   }
 
   /**
-   * Adds contexts path by pid.
-   *
-   * @param string|int $pid
-   *   Path id.
-   * @param string $contextsPathNew
-   *   New contexts path.
-   * @param string $contextsPathExisting
-   *   Existing contexts path.
+   * {@inheritdoc}
    */
-  public function updateContextsPath($pid, $contextsPathNew, $contextsPathExisting) {
+  public function updateContextsPath($pid, $contextsPathNew, $contextsPathExisting, $weight = 0) {
 
     $this->connection->update(static::TABLE_CONTEXTS)
-      ->fields(['contexts_path' => $contextsPathNew])
+      ->fields([
+        'contexts_path' => $contextsPathNew,
+        'weight' => $weight,
+        ])
       ->condition('pid', $pid)
       ->condition('contexts_path', $contextsPathExisting)
       ->execute();
@@ -67,7 +57,20 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
   /**
    * {@inheritdoc}
    */
-  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contextsPathNew = NULL, $contextsPathExisting = NULL) {
+  public function deleteContextsPath($pid, $contextsPath = NULL) {
+
+    $query = $this->connection->delete(static::TABLE_CONTEXTS);
+    $query->condition('pid', $pid);
+    if (!is_null($contextsPath)) {
+      $query->condition('contexts_path', $contextsPath);
+    }
+    $query->execute();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save($source, $alias, $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED, $pid = NULL, $contextsPathNew = NULL, $contextsPathExisting = NULL, $weight = 0) {
 
     if ($source[0] !== '/') {
       throw new \InvalidArgumentException(sprintf('Source path %s has to start with a slash.', $source));
@@ -110,7 +113,7 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       $operation = 'insert';
       // Insert into additional table.
       if (!empty($contextsPathNew)) {
-        $this->addContextsPath($pid, $contextsPathNew);
+        $this->addContextsPath($pid, $contextsPathNew, $weight);
       }
     }
     else {
@@ -143,10 +146,10 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
       $pid = $query->execute();
       if (!empty($contextsPathNew)) {
         if (!empty($contextsPathExisting)) {
-          $this->updateContextsPath($pid, $contextsPathNew, $contextsPathExisting);
+          $this->updateContextsPath($pid, $contextsPathNew, $contextsPathExisting, $weight);
         }
         else {
-          $this->addContextsPath($pid, $contextsPathNew);
+          $this->addContextsPath($pid, $contextsPathNew, $weight);
         }
       }
       $fields['original'] = $original;
@@ -186,7 +189,7 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
 
       return $select
         ->fields('ua')
-        ->fields('uac', ['contexts_path'])
+        ->fields('uac', ['contexts_path', 'weight'])
         ->orderBy('ua.pid', 'DESC')
         ->range(0, 1)
         ->execute()
@@ -215,14 +218,14 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
         $select->condition('uac.contexts_path', $value);
       }
       else {
-        $select->condition('ua' . $field, $value);
+        $select->condition('ua.' . $field, $value);
       }
     }
     try {
 
       return $select
         ->fields('ua')
-        ->fields('uac', ['contexts_path'])
+        ->fields('uac', ['contexts_path', 'weight'])
         ->orderBy('ua.pid', 'ASC')
         ->execute()
         ->fetchAllAssoc('pid', \PDO::FETCH_ASSOC);
@@ -441,9 +444,17 @@ class ContextsAliasStorage extends AliasStorage implements ContextsAliasStorageI
           'not null' => TRUE,
           'default' => '',
         ],
+        'weight' => [
+          'description' => 'A unique path alias identifier.',
+          'type' => 'int',
+          'not null' => TRUE,
+          'size' => 'normal',
+          'unsigned' => TRUE,
+          'default' => 0,
+        ],
       ],
       'primary key' => [
-        'pid', 'contexts_path'
+        'pid', 'contexts_path', 'weight'
       ],
     ];
   }

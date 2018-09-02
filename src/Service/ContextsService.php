@@ -60,7 +60,7 @@ class ContextsService implements ContextsServiceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHelperBaseService() {
+  public function getBaseHelper() {
 
     return $this->helperBaseService;
   }
@@ -68,7 +68,7 @@ class ContextsService implements ContextsServiceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHelperFieldService() {
+  public function getFieldHelper() {
 
     return $this->helperFieldService;
   }
@@ -76,7 +76,7 @@ class ContextsService implements ContextsServiceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getHelperEntityService() {
+  public function getEntityHelper() {
 
     return $this->helperEntityService;
   }

@@ -27,20 +27,20 @@ interface ContextsServiceInterface {
    *
    * @return ContextsHelperBaseServiceInterface
    */
-  public function getHelperBaseService();
+  public function getBaseHelper();
 
   /**
    * Helper field service.
    *
    * @return ContextsHelperFieldServiceInterface
    */
-  public function getHelperFieldService();
+  public function getFieldHelper();
 
   /**
    * Helper entity service.
    *
    * @return ContextsHelperEntityServiceInterface
    */
-  public function getHelperEntityService();
+  public function getEntityHelper();
 
 }

@@ -101,7 +101,7 @@ class ContextsBatchHandler {
   public static function processFieldPurgeBatch(array &$context) {
 
     ContextsService::instance()
-      ->getHelperFieldService()
+      ->getFieldHelper()
       ->fieldPurgeBatch($context['batch_size'], $context['storage_id']);
     $context['results'][] = TRUE;
     $context['message'] = t('Processing...(@count/@total)', [

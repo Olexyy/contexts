@@ -5,7 +5,6 @@ services:
     -  '@entity_type.manager'
     -  '@module_handler'
     -  '@entity_type.bundle.info'
-    -  '@path.alias_storage'
   contexts.helper.field:
     class: Drupal\contexts\Service\ContextsHelperFieldService
     arguments:
@@ -14,6 +13,7 @@ services:
     class: Drupal\contexts\Service\ContextsHelperEntityService
     arguments:
     -  '@contexts.helper.base'
+    -  '@path.alias_storage'
   contexts.service:
     class: Drupal\contexts\Service\ContextsService
     arguments:

@@ -71,7 +71,7 @@ class ContextsDashboardForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
 
-    $helperFieldService = $this->contextsService->getHelperFieldService();
+    $helperFieldService = $this->contextsService->getFieldHelper();
     $form['context_field_wrapper'] = [
       '#type' => 'details',
       '#title' => $this->t('Context aware content'),
@@ -136,7 +136,7 @@ class ContextsDashboardForm extends FormBase {
    */
   public function callbackHandler(array &$form, FormStateInterface $form_state) {
 
-    $helperFieldService = $this->contextsService->getHelperFieldService();
+    $helperFieldService = $this->contextsService->getFieldHelper();
     $this->getRequest()->query->remove('destination');
     $action = $form_state->getTriggeringElement()['#name'];
     $entityTypeId = $form_state->getTriggeringElement()['#entity_type_id'];

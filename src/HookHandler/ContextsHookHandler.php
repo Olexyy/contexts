@@ -43,12 +43,24 @@ class ContextsHookHandler implements ContainerInjectionInterface {
     );
   }
 
+  /**
+   * Implements hook_entity_insert().
+   */
   public function hookEntityInsert(EntityInterface $entity) {
-    $a = 1;
+
+    $this->contextsService
+      ->getEntityHelper()
+      ->processContextsAliases($entity, FALSE);
   }
 
+  /**
+   * Implements hook_entity_update().
+   */
   public function hookEntityUpdate(EntityInterface $entity) {
-    $a = 1;
+
+    $this->contextsService
+      ->getEntityHelper()
+      ->processContextsAliases($entity, TRUE);
   }
 
 }

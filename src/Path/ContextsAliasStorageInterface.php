@@ -21,8 +21,10 @@ interface ContextsAliasStorageInterface extends AliasStorageInterface {
    *   New contexts path.
    * @param string $contextsPathExisting
    *   Existing contexts path.
+   * @param int $weight
+   *   Path alias weight.
    */
-  public function updateContextsPath($pid, $contextsPathNew, $contextsPathExisting);
+  public function updateContextsPath($pid, $contextsPathNew, $contextsPathExisting, $weight = 0);
 
   /**
    * Adds contexts path by pid.
@@ -31,10 +33,20 @@ interface ContextsAliasStorageInterface extends AliasStorageInterface {
    *   Path id.
    * @param string $contextsPath
    *   Contexts path.
-   *
-   * @throws \Exception
+   * @param int $weight
+   *   Path alias weight.
    */
-  public function addContextsPath($pid, $contextsPath);
+  public function addContextsPath($pid, $contextsPath, $weight = 0);
+
+  /**
+   * Helper to delete specific context paths.
+   *
+   * @param string $pid
+   *   Path id.
+   * @param null $contextsPath
+   *   Specific path if needed.
+   */
+  public function deleteContextsPath($pid, $contextsPath = NULL);
 
   /**
    * Schema definition function.

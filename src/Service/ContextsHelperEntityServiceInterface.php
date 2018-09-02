@@ -46,11 +46,24 @@ interface ContextsHelperEntityServiceInterface {
   public function getContexts(EntityInterface $entity);
 
   /**
+   * Getter for all allowed contexts paths for given entity.
+   *
+   * @param EntityInterface $entity
+   *   Given entity.
+   *
+   * @return array|string[]
+   *   Array of contexts paths.
+   */
+  public function getContextsPaths(EntityInterface $entity);
+
+  /**
    * Processes context aliases.
    *
    * @param EntityInterface $entity
    *   Target entity.
+   * @param bool $update
+   *   Flag defines if this is update action.
    */
-  public function processContextsAliases(EntityInterface $entity);
+  public function processContextsAliases(EntityInterface $entity, $update);
 
 }

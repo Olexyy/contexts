@@ -3,10 +3,8 @@
 namespace Drupal\contexts\Service;
 
 use Drupal\contexts\Path\ContextsAliasStorageInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -43,13 +41,6 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   protected $entityTypeBundleInfo;
 
   /**
-   * Alias storage.
-   *
-   * @var ContextsAliasStorageInterface
-   */
-  protected $aliasStorage;
-
-  /**
    * ContextsService constructor.
    *
    * @param EntityTypeManagerInterface $entityTypeManager
@@ -58,18 +49,14 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
    *   Module handler.
    * @param EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Entity bundle info.
-   * @param ContextsAliasStorageInterface $aliasStorage
-   *   Contexts alias storage.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager,
                               ModuleHandlerInterface $moduleHandler,
-                              EntityTypeBundleInfoInterface $entityTypeBundleInfo,
-                              ContextsAliasStorageInterface $aliasStorage) {
+                              EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
 
     $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $moduleHandler;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
-    $this->aliasStorage = $aliasStorage;
   }
 
   /**
