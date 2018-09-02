@@ -69,7 +69,7 @@ class Context extends ConfigEntityBase implements ContextInterface {
    */
   public function getPosition() {
 
-    return $this->position? (int) $this->position : 1;
+    return (int) $this->position;
   }
 
   /**

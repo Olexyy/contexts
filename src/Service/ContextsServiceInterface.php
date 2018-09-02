@@ -23,92 +23,24 @@ interface ContextsServiceInterface {
   public static function instance();
 
   /**
-   * Adds contexts field to entity by bundle.
+   * Helper base service.
    *
-   * @param string $entityTypeId
-   *   Entity type id.
-   *
-   * @param string $entityBundle
-   *   Entity bundle name.
-   *
-   * @return bool
-   *   Execution result.
+   * @return ContextsHelperBaseServiceInterface
    */
-  public function addContextsField($entityTypeId, $entityBundle);
+  public function getHelperBaseService();
 
   /**
-   * Removes contexts field form entity by bundle.
+   * Helper field service.
    *
-   * @param string $entityTypeId
-   *   Entity type id.
-   *
-   * @param string $entityBundle
-   *   Entity bundle name.
-   *
-   * @return bool
-   *   Execution result.
+   * @return ContextsHelperFieldServiceInterface
    */
-  public function removeContextsField($entityTypeId, $entityBundle);
+  public function getHelperFieldService();
 
   /**
-   * Getter for field config storage.
+   * Helper entity service.
    *
-   * @param string $entityTypeId
-   *   Entity type id.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\field\Entity\FieldStorageConfig|null
-   *   Field storage config.
+   * @return ContextsHelperEntityServiceInterface
    */
-  public function getFieldStorageConfig($entityTypeId);
+  public function getHelperEntityService();
 
-  /**
-   * Getter for field config storage.
-   *
-   * @param string $entityTypeId
-   *   Entity type id.
-   * @param string $entityBundle
-   *   Entity bundle.
-   *
-   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\field\Entity\FieldConfig|null
-   *   Field storage config.
-   */
-  public function getFieldConfig($entityTypeId, $entityBundle);
-
-  /**
-   * Getter for entity storage.
-   *
-   * @param string $entityType
-   *   Entity type.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface|null
-   *   Entity storage if any.
-   */
-  public function getEntityTypeStorage($entityType);
-
-  /**
-   * Getter for entity type definitions.
-   *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
-   *   Entity storage if any.
-   */
-  public function getEntityTypeDefinitions();
-
-  /**
-   * Exception logger.
-   *
-   * @param \Exception $exception
-   *   Exception.
-   */
-  public function catchException(\Exception $exception);
-
-  /**
-   * Get the bundle info of all entity types.
-   *
-   * @return array
-   *   An array of bundle information where the outer array is keyed by entity
-   *   type. The next level is keyed by the bundle name. The inner arrays are
-   *   associative arrays of bundle information, such as the label for the
-   *   bundle.
-   */
-  public function getContentEntityTypeBundleInfo();
 }

@@ -38,25 +38,24 @@ class ContextForm extends EntityForm {
     ];
 
     $form['position'] = [
-      '#type' => 'textfield',
+      '#type' => 'number',
+      '#min' => 0,
+      '#max' => 100,
       '#title' => $this->t('Position'),
       '#default_value' => $context->getPosition(),
       '#required' => TRUE,
-      '#attributes' => [
-        ' type' => 'number',
-      ],
       '#description' => $this->t("Position in path."),
     ];
 
     return $form;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateForm(array &$form, FormStateInterface $form_state) {
 
     parent::validateForm($form, $form_state);
-    if (!$form_state->getValue('position') || $form_state->getValue('position') < 0) {
-      $form_state->setErrorByName('position', $this->t('Position value is invalid'));
-    }
   }
 
   /**

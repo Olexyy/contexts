@@ -1,7 +1,22 @@
 services:
+  contexts.helper.base:
+    class: Drupal\contexts\Service\ContextsHelperBaseService
+    arguments:
+    -  '@entity_type.manager'
+    -  '@module_handler'
+    -  '@entity_type.bundle.info'
+    -  '@path.alias_storage'
+  contexts.helper.field:
+    class: Drupal\contexts\Service\ContextsHelperFieldService
+    arguments:
+    -  '@contexts.helper.base'
+  contexts.helper.entity:
+    class: Drupal\contexts\Service\ContextsHelperEntityService
+    arguments:
+    -  '@contexts.helper.base'
   contexts.service:
     class: Drupal\contexts\Service\ContextsService
     arguments:
-      -  '@entity_type.manager'
-      -  '@module_handler'
-      -  '@entity_type.bundle.info'
+      -  '@contexts.helper.base'
+      -  '@contexts.helper.field'
+      -  '@contexts.helper.entity'

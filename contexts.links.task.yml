@@ -1,0 +1,12 @@
+
+contexts.dashboard:
+  route_name: contexts.dashboard
+  title: 'Dashboard'
+  base_route: contexts.dashboard
+
+entity.context.collection:
+  title: 'Contexts list'
+  route_name: entity.context.collection
+  base_route: contexts.dashboard
+
+

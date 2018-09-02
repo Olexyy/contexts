@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Contains hooks implementations for contexts module.
+ */
+
+use Drupal\contexts\HookHandler\ContextsHookHandler;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_insert().
+ */
+function contexts_entity_insert(EntityInterface $entity) {
+
+  \Drupal::classResolver()
+    ->getInstanceFromDefinition(ContextsHookHandler::class)
+    ->hookEntityInsert($entity);
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function contexts_entity_update(EntityInterface $entity) {
+
+  \Drupal::classResolver()
+    ->getInstanceFromDefinition(ContextsHookHandler::class)
+    ->hookEntityUpdate($entity);
+}
