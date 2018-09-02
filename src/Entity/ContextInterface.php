@@ -9,5 +9,22 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface ContextInterface extends ConfigEntityInterface {
 
-  // Add get/set methods for your configuration properties here.
+  /**
+   * Getter for position.
+   *
+   * @return int
+   *   Value.
+   */
+  public function getPosition();
+
+  /**
+   * Setter for position.
+   *
+   * @param int $position
+   *   Position.
+   *
+   * @return $this
+   */
+  public function setPosition($position);
+
 }

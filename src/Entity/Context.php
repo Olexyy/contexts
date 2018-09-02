@@ -54,4 +54,37 @@ class Context extends ConfigEntityBase implements ContextInterface {
    */
   protected $label;
 
+  /**
+   * Position in path.
+   *
+   * @var int
+   */
+  protected $position;
+
+  /**
+   * Getter for position.
+   *
+   * @return int
+   *   Value.
+   */
+  public function getPosition() {
+
+    return $this->position? (int) $this->position : 1;
+  }
+
+  /**
+   * Setter for position.
+   *
+   * @param int $position
+   *   Position.
+   *
+   * @return $this
+   */
+  public function setPosition($position) {
+
+    $this->position = (int) $position;
+
+    return $this;
+  }
+
 }

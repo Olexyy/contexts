@@ -10,3 +10,5 @@ contexts.context.*:
       label: 'Label'
     uuid:
       type: string
+    position:
+      type: integer
