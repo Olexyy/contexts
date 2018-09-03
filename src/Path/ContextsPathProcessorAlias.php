@@ -9,6 +9,7 @@ use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ContextsPathProcessorAlias.
@@ -55,6 +56,15 @@ class ContextsPathProcessorAlias implements InboundPathProcessorInterface, Outbo
     $path = $this->contextsManager->processPathInbound($path);
     // Switch to system path if any.
     $path = $this->aliasManager->getPathByAlias($path, NULL, $this->contextsManager->getContextsPath());
+    // Duplicate processInboundFront as it fired before already.
+    if ($path === '/') {
+      $path = \Drupal::config('system.site')->get('page.front');
+      if (empty($path)) {
+        // We have to return a valid path but / won't be routable and config
+        // might be broken so stop execution.
+        throw new NotFoundHttpException();
+      }
+    }
 
     return $path;
   }

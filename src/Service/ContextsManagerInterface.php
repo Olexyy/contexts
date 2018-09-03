@@ -11,6 +11,12 @@ use Drupal\contexts\Entity\ContextInterface;
  */
 interface ContextsManagerInterface {
 
+  /**
+   * Negotiate contexts based on path.
+   *
+   * @param string $path
+   *   Given path.
+   */
   public function negotiateContexts($path);
 
   /**

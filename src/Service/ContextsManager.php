@@ -54,43 +54,14 @@ class ContextsManager implements ContextsManagerInterface {
   }
 
   /**
-   * @param string $path
-   *   Given path.
+   * {@inheritdoc}
    */
   public function negotiateContexts($path) {
 
-    $contexts = [];
-    $parts = explode('/', trim($path, '/'));
-    $prefix = array_shift($parts);
-    // Search prefix within added languages.
-    while ($context = $this->loadContext($prefix)) {
-      $contexts[] = $context;
-      $path = '/' . implode('/', $parts);
+    if (!static::$initialized) {
+      $contexts = [];
       $parts = explode('/', trim($path, '/'));
       $prefix = array_shift($parts);
-    }
-    $this->setContexts($contexts);
-    static::$initialized = TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processPathInbound($path) {
-
-    $contexts = [];
-    $parts = explode('/', trim($path, '/'));
-    $prefix = array_shift($parts);
-    if (static::$initialized) {
-      foreach (static::$contexts as $context) {
-        if ($prefix == $context->id()) {
-          $path = '/' . implode('/', $parts);
-          $parts = explode('/', trim($path, '/'));
-          $prefix = array_shift($parts);
-        }
-      }
-    }
-    else {
       while ($context = $this->loadContext($prefix)) {
         $contexts[] = $context;
         $path = '/' . implode('/', $parts);
@@ -100,6 +71,26 @@ class ContextsManager implements ContextsManagerInterface {
       $this->setContexts($contexts);
       static::$initialized = TRUE;
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function processPathInbound($path) {
+
+    if (!static::$initialized) {
+      $this->negotiateContexts($path);
+    }
+    $parts = explode('/', trim($path, '/'));
+    $prefix = array_shift($parts);
+    foreach (static::$contexts as $context) {
+      if ($prefix == $context->id()) {
+        $path = '/' . implode('/', $parts);
+        $parts = explode('/', trim($path, '/'));
+        $prefix = array_shift($parts);
+      }
+    }
+
     return $path;
   }
 
