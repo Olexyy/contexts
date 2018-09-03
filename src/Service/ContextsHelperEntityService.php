@@ -140,28 +140,7 @@ class ContextsHelperEntityService implements ContextsHelperEntityServiceInterfac
    */
   public function getContextsPaths(EntityInterface $entity) {
 
-    $contextsPaths = [];
-    $contextsNames = [];
-    $aggregatedNames = [];
-    foreach ($this->getContexts($entity) as $context) {
-      $contextsNames[$context->getPosition()][] = $context->id();
-    }
-    foreach ($contextsNames as $position => $names) {
-      foreach ($names as $name) {
-        if (!$position) {
-          $aggregatedNames[] = $name;
-          $contextsPaths[] = $name;
-        }
-        else {
-          foreach ($aggregatedNames as &$aggregatedName) {
-            $aggregatedName .= '/' . $name;
-            $contextsPaths[] = $aggregatedName;
-          }
-        }
-      }
-    }
-
-    return $contextsPaths;
+    return $this->helperBaseService->getContextsPaths($this->getContexts($entity));
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\contexts\Service;
 
+use Drupal\contexts\Entity\ContextInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
@@ -75,5 +76,16 @@ interface ContextsHelperBaseServiceInterface {
    *   Bundle info service.
    */
   public function getEntityTypeBundleInfo();
+
+  /**
+   * Getter for all allowed contexts paths for given contexts.
+   *
+   * @param ContextInterface[] $contexts
+   *   Given entity.
+   *
+   * @return array|string[]
+   *   Array of contexts paths.
+   */
+  public function getContextsPaths(array $contexts);
 
 }

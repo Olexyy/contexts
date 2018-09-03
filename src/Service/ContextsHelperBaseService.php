@@ -2,6 +2,7 @@
 
 namespace Drupal\contexts\Service;
 
+use Drupal\contexts\Entity\ContextInterface;
 use Drupal\contexts\Path\ContextsAliasStorageInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -162,6 +163,41 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   public function getEntityTypeBundleInfo() {
 
     return $this->entityTypeBundleInfo;
+  }
+
+  /**
+   * Getter for all allowed contexts paths for given contexts.
+   *
+   * @param ContextInterface[] $contexts
+   *   Given entity.
+   *
+   * @return array|string[]
+   *   Array of contexts paths.
+   */
+  public function getContextsPaths(array $contexts) {
+
+    $contextsPaths = [];
+    $contextsNames = [];
+    $aggregatedNames = [];
+    foreach ($contexts as $context) {
+      $contextsNames[$context->getPosition()][] = $context->id();
+    }
+    foreach ($contextsNames as $position => $names) {
+      foreach ($names as $name) {
+        if (!$position) {
+          $aggregatedNames[] = $name;
+          $contextsPaths[] = $name;
+        }
+        else {
+          foreach ($aggregatedNames as &$aggregatedName) {
+            $aggregatedName .= '/' . $name;
+            $contextsPaths[] = $aggregatedName;
+          }
+        }
+      }
+    }
+
+    return $contextsPaths;
   }
 
 }

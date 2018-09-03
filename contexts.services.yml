@@ -14,9 +14,23 @@ services:
     arguments:
     -  '@contexts.helper.base'
     -  '@path.alias_storage'
+  contexts.manager:
+    class: Drupal\contexts\Service\ContextsManager
+    arguments:
+      - '@contexts.helper.base'
   contexts.service:
     class: Drupal\contexts\Service\ContextsService
     arguments:
       -  '@contexts.helper.base'
       -  '@contexts.helper.field'
       -  '@contexts.helper.entity'
+  contexts.reauest.subscriber:
+    class: Drupal\contexts\EventSubscriber\ContextsRequestSubscriber
+    arguments: ['@contexts.manager']
+    tags:
+    - { name: event_subscriber }
+  cache_context.contexts:
+    class: Drupal\contexts\Cache\ContextsCacheContext
+    arguments: ['@contexts.manager']
+    tags:
+    - { name: cache.context }

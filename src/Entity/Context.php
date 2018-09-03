@@ -87,4 +87,17 @@ class Context extends ConfigEntityBase implements ContextInterface {
     return $this;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+
+    if ($this->isNew()) {
+
+      return [];
+    }
+
+    return [$this->entityTypeId . ':' . $this->id()];
+  }
+
 }
