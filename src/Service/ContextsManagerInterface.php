@@ -119,4 +119,36 @@ interface ContextsManagerInterface {
    */
   public function isValid();
 
+  /**
+   * Getter.
+   *
+   * @return bool
+   *   Initialized state.
+   */
+  public function isInitialized();
+
+  /**
+   * Setter.
+   *
+   * @param bool $initialized
+   *   Initialized state.
+   */
+  public function setInitialized($initialized);
+
+  /**
+   * Getter.
+   *
+   * @return bool
+   *   Inconsistent state.
+   */
+  public function isInconsistent();
+
+  /**
+   * Setter.
+   *
+   * @param bool $inconsistent
+   *   Inconsistent state.
+   */
+  public function setInconsistent($inconsistent);
+
 }

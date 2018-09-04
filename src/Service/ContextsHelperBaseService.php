@@ -3,7 +3,7 @@
 namespace Drupal\contexts\Service;
 
 use Drupal\contexts\Entity\ContextInterface;
-use Drupal\contexts\Path\ContextsAliasStorageInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -42,6 +42,13 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   protected $entityTypeBundleInfo;
 
   /**
+   * Database.
+   *
+   * @var Connection
+   */
+  protected $database;
+
+  /**
    * ContextsService constructor.
    *
    * @param EntityTypeManagerInterface $entityTypeManager
@@ -50,14 +57,17 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
    *   Module handler.
    * @param EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   Entity bundle info.
+   * @param Connection $database
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager,
                               ModuleHandlerInterface $moduleHandler,
-                              EntityTypeBundleInfoInterface $entityTypeBundleInfo) {
+                              EntityTypeBundleInfoInterface $entityTypeBundleInfo,
+                              Connection $database) {
 
     $this->entityTypeManager = $entityTypeManager;
     $this->moduleHandler = $moduleHandler;
     $this->entityTypeBundleInfo = $entityTypeBundleInfo;
+    $this->database = $database;
   }
 
   /**
@@ -70,13 +80,7 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   }
 
   /**
-   * Getter for entity storage.
-   *
-   * @param string $entityType
-   *   Entity type.
-   *
-   * @return \Drupal\Core\Entity\EntityStorageInterface|null
-   *   Entity storage if any.
+   * {@inheritdoc}
    */
   public function getEntityTypeStorage($entityType) {
 
@@ -145,9 +149,7 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   }
 
   /**
-   * Getter for module handler.
-   *
-   * @return ModuleHandlerInterface
+   * {@inheritdoc}
    */
   public function getModuleHandler() {
 
@@ -155,10 +157,7 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   }
 
   /**
-   * Getter for bundle info service
-   *
-   * @return EntityTypeBundleInfoInterface
-   *   Bundle info service.
+   * {@inheritdoc}
    */
   public function getEntityTypeBundleInfo() {
 
@@ -166,13 +165,7 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
   }
 
   /**
-   * Getter for all allowed contexts paths for given contexts.
-   *
-   * @param ContextInterface[] $contexts
-   *   Given entity.
-   *
-   * @return array|string[]
-   *   Array of contexts paths.
+   * {@inheritdoc}
    */
   public function getContextsPaths(array $contexts) {
 
@@ -198,6 +191,23 @@ class ContextsHelperBaseService implements ContextsHelperBaseServiceInterface {
     }
 
     return $contextsPaths;
+  }
+
+  /**
+   *  Predicate to validate against similar paths.
+   *
+   * @param string $pathPart
+   *   Path part.
+   *
+   * @return bool
+   *   Test result.
+   */
+  public function pathExistsLike($pathPart) {
+
+    $query = $this->database
+      ->query("SELECT COUNT(*) as count FROM {router} WHERE path LIKE '%{$pathPart}%'");
+
+    return (bool) $query->fetchField()['count'];
   }
 
 }

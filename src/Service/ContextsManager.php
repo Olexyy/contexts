@@ -33,6 +33,13 @@ class ContextsManager implements ContextsManagerInterface {
   static $initialized;
 
   /**
+   * Inconsistent marker.
+   *
+   * @var bool
+   */
+  static $inconsistent;
+
+  /**
    * Base helper service.
    *
    * @var ContextsHelperBaseService
@@ -50,6 +57,7 @@ class ContextsManager implements ContextsManagerInterface {
     static::$contexts = [];
     static::$valid = TRUE;
     static::$initialized = FALSE;
+    static::$inconsistent = FALSE;
     $this->helperBaseService = $helperBaseService;
   }
 
@@ -65,8 +73,16 @@ class ContextsManager implements ContextsManagerInterface {
         if (($langCode && $prefix == $langCode) || ($langPrefix && $prefix == $langPrefix)) {
           $prefix = array_shift($parts);
         }
+        $position = 0;
         while ($context = $this->loadContext($prefix)) {
-          $contexts[] = $context;
+          if ($context->getPosition() == $position) {
+            $contexts[$position] = $context;
+            $position ++;
+          }
+          else {
+            $this->setInconsistent(TRUE);
+            break;
+          }
           $path = '/' . implode('/', $parts);
           $parts = explode('/', trim($path, '/'));
           $prefix = array_shift($parts);
@@ -211,7 +227,7 @@ class ContextsManager implements ContextsManagerInterface {
   }
 
   /**
-   * @return bool
+   * {@inheritdoc}
    */
   public function isInitialized() {
 
@@ -219,11 +235,27 @@ class ContextsManager implements ContextsManagerInterface {
   }
 
   /**
-   * @param $initialized
+   * {@inheritdoc}
    */
   public function setInitialized($initialized) {
 
     static::$initialized = $initialized;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isInconsistent() {
+
+    return static::$inconsistent;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setInconsistent($inconsistent) {
+
+    static::$inconsistent = $inconsistent;
   }
 
 }

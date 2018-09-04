@@ -88,4 +88,15 @@ interface ContextsHelperBaseServiceInterface {
    */
   public function getContextsPaths(array $contexts);
 
+  /**
+   *  Predicate to validate against similar paths.
+   *
+   * @param string $pathPart
+   *   Path part.
+   *
+   * @return bool
+   *   Test result.
+   */
+  public function pathExistsLike($pathPart);
+
 }

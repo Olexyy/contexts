@@ -2,14 +2,45 @@
 
 namespace Drupal\contexts\Form;
 
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\contexts\Entity\ContextInterface;
+use Drupal\contexts\Service\ContextsServiceInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class ContextForm.
  */
 class ContextForm extends EntityForm {
+
+  /**
+   * Contexts service.
+   *
+   * @var \Drupal\contexts\Service\ContextsServiceInterface
+   */
+  protected $contextsService;
+
+  /**
+   * BlockchainDashboardForm constructor.
+   *
+   * @param \Drupal\contexts\Service\ContextsServiceInterface $contextsService
+   *   Blockchain service.
+   */
+  public function __construct(ContextsServiceInterface $contextsService) {
+
+    $this->contextsService = $contextsService;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+
+    return new static(
+      $container->get('contexts.service')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -56,6 +87,13 @@ class ContextForm extends EntityForm {
   public function validateForm(array &$form, FormStateInterface $form_state) {
 
     parent::validateForm($form, $form_state);
+
+    $id = SafeMarkup::checkPlain($form_state->getValue('id'));
+    if ($this->contextsService->getBaseHelper()->pathExistsLike($id)) {
+      $form_state->setErrorByName('id', $this->t("Context id '@id' is alike existing path.", [
+        '@id' => $id,
+      ]));
+    }
   }
 
   /**

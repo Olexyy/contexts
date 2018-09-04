@@ -5,6 +5,7 @@ services:
     -  '@entity_type.manager'
     -  '@module_handler'
     -  '@entity_type.bundle.info'
+    -  '@database'
   contexts.helper.field:
     class: Drupal\contexts\Service\ContextsHelperFieldService
     arguments:
