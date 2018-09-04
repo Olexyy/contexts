@@ -37,3 +37,9 @@ services:
     arguments: ['@contexts.manager']
     tags:
     - { name: cache.context }
+  contexts.uninstall_validator:
+    class: Drupal\contexts\UninstallValidator\ContextsUninstallValidator
+    tags:
+    - { name: module_install.uninstall_validator }
+    arguments: ['@contexts.service']
+    lazy: true
