@@ -16,8 +16,12 @@ interface ContextsManagerInterface {
    *
    * @param string $path
    *   Given path.
+   * @param string $langCode
+   *   Given language code.
+   * @param string|null $prefix
+   *   Given language prefix.
    */
-  public function negotiateContexts($path);
+  public function negotiateContexts($path, $langCode, $prefix);
 
   /**
    * Path processor function.

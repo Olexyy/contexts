@@ -4,6 +4,8 @@ namespace Drupal\contexts\EventSubscriber;
 
 
 use Drupal\contexts\Service\ContextsManagerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -24,14 +26,36 @@ class ContextsRequestSubscriber implements EventSubscriberInterface {
   protected $contextsManager;
 
   /**
+   * Language manager.
+   *
+   * @var LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * Config factory.
+   *
+   * @var ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * ContextsRequestSubscriber constructor.
    *
    * @param ContextsManagerInterface $contextsManager
    *   Contexts manager.
+   * @param LanguageManagerInterface $languageManager
+   *   Language manager.
+   * @param ConfigFactoryInterface $configFactory
+   *   Config factory.
    */
-  public function __construct(ContextsManagerInterface $contextsManager) {
+  public function __construct(ContextsManagerInterface $contextsManager,
+                              LanguageManagerInterface $languageManager,
+                              ConfigFactoryInterface $configFactory) {
 
     $this->contextsManager = $contextsManager;
+    $this->languageManager = $languageManager;
+    $this->configFactory = $configFactory;
   }
 
   /**
@@ -41,10 +65,25 @@ class ContextsRequestSubscriber implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onKernelRequestContexts(GetResponseEvent $event) {
+
     if ($event->getRequestType() == HttpKernelInterface::MASTER_REQUEST) {
       $uri = $event->getRequest()->getRequestUri();
-      $this->contextsManager->negotiateContexts($uri);
+      $langCode = $this->languageManager->getCurrentLanguage()->getId();
+      $prefix = $this->getLanguagePrefix($langCode);
+      $this->contextsManager->negotiateContexts($uri, $langCode, $prefix);
     }
+  }
+
+  private function getLanguagePrefix($langCode) {
+
+    if ($prefixes = $this->configFactory->get('language.negotiation')->get('url.prefixes')) {
+      if (isset($prefixes[$langCode])) {
+
+        return $prefixes[$langCode];
+      }
+    }
+
+    return NULL;
   }
 
   /**
@@ -55,7 +94,8 @@ class ContextsRequestSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
 
-    $events[KernelEvents::REQUEST][] = ['onKernelRequestContexts', 255];
+    // Just after language negotiation (255).
+    $events[KernelEvents::REQUEST][] = ['onKernelRequestContexts', 254];
 
     return $events;
   }

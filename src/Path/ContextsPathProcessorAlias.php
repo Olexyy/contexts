@@ -60,8 +60,6 @@ class ContextsPathProcessorAlias implements InboundPathProcessorInterface, Outbo
     if ($path === '/') {
       $path = \Drupal::config('system.site')->get('page.front');
       if (empty($path)) {
-        // We have to return a valid path but / won't be routable and config
-        // might be broken so stop execution.
         throw new NotFoundHttpException();
       }
     }

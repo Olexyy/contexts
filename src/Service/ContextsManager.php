@@ -56,12 +56,15 @@ class ContextsManager implements ContextsManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function negotiateContexts($path) {
+  public function negotiateContexts($path, $langCode, $langPrefix) {
 
     if (!static::$initialized) {
       $contexts = [];
       $parts = explode('/', trim($path, '/'));
       $prefix = array_shift($parts);
+      if ($prefix == $langCode || $prefix == $langPrefix) {
+        $prefix = array_shift($parts);
+      }
       while ($context = $this->loadContext($prefix)) {
         $contexts[] = $context;
         $path = '/' . implode('/', $parts);
@@ -78,9 +81,6 @@ class ContextsManager implements ContextsManagerInterface {
    */
   public function processPathInbound($path) {
 
-    if (!static::$initialized) {
-      $this->negotiateContexts($path);
-    }
     $parts = explode('/', trim($path, '/'));
     $prefix = array_shift($parts);
     foreach (static::$contexts as $context) {
@@ -207,6 +207,22 @@ class ContextsManager implements ContextsManagerInterface {
   public function isValid() {
 
     return static::$valid;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isInitialized() {
+
+    return static::$initialized;
+  }
+
+  /**
+   * @param $initialized
+   */
+  public function setInitialized($initialized) {
+
+    static::$initialized = $initialized;
   }
 
 }

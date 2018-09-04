@@ -24,9 +24,12 @@ services:
       -  '@contexts.helper.base'
       -  '@contexts.helper.field'
       -  '@contexts.helper.entity'
-  contexts.reauest.subscriber:
+  contexts.request.subscriber:
     class: Drupal\contexts\EventSubscriber\ContextsRequestSubscriber
-    arguments: ['@contexts.manager']
+    arguments:
+      -  '@contexts.manager'
+      -  '@language_manager'
+      -  '@config.factory'
     tags:
     - { name: event_subscriber }
   cache_context.contexts:
