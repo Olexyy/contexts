@@ -58,21 +58,22 @@ class ContextsManager implements ContextsManagerInterface {
    */
   public function negotiateContexts($path, $langCode, $langPrefix) {
 
-    if (!static::$initialized) {
+    if (!$this->isInitialized()) {
       $contexts = [];
-      $parts = explode('/', trim($path, '/'));
-      $prefix = array_shift($parts);
-      if ($prefix == $langCode || $prefix == $langPrefix) {
+      if ($parts = explode('/', trim($path, '/'))) {
         $prefix = array_shift($parts);
+        if (($langCode && $prefix == $langCode) || ($langPrefix && $prefix == $langPrefix)) {
+          $prefix = array_shift($parts);
+        }
+        while ($context = $this->loadContext($prefix)) {
+          $contexts[] = $context;
+          $path = '/' . implode('/', $parts);
+          $parts = explode('/', trim($path, '/'));
+          $prefix = array_shift($parts);
+        }
+        $this->setContexts($contexts);
       }
-      while ($context = $this->loadContext($prefix)) {
-        $contexts[] = $context;
-        $path = '/' . implode('/', $parts);
-        $parts = explode('/', trim($path, '/'));
-        $prefix = array_shift($parts);
-      }
-      $this->setContexts($contexts);
-      static::$initialized = TRUE;
+      $this->setInitialized(TRUE);
     }
   }
 
@@ -195,7 +196,7 @@ class ContextsManager implements ContextsManagerInterface {
 
         return FALSE;
       }
-      $sequence++;
+      $sequence ++;
     }
 
     return TRUE;
